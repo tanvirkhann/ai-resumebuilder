@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 
 const ExperienceForm = ({ data, onChange }) => {
 
-   const { token } = useSelector(state => state.auth)
-   const [generatingIndex, setGenerating] = useState(-1)
+  const { token } = useSelector(state => state.auth)
+  const [generatingIndex, setGeneratingIndex] = useState(-1)
 
   // ✅ Add a new blank experience object
   const addExperience = () => {
@@ -38,23 +38,25 @@ const ExperienceForm = ({ data, onChange }) => {
 
   const generateDescription = async (index) => {
     setGeneratingIndex(index)
-    const experience =data[index]
+    const experience = data[index]
     const prompt = `enhance this job description ${experience.description} for the
     position of ${experience.position} at ${experience.company}.`
     try {
-      const {data} = await api.post('api/ai/enhance-job-desc' , {userContent:
-        prompt }, {headers:{Authorization:token}} )
-        updateExperience(index, "description", data.enhancedContent)
+      const { data } = await api.post('/api/ai/enhance-job-desc', {
+        userContent:
+          prompt
+      }, { headers: { Authorization: token } })
+      updateExperience(index, "description", data.enhancedContent)
     } catch (error) {
       toast.error(error.message)
-    }finally{
+    } finally {
       setGeneratingIndex(-1)
     }
   }
 
   return (
     <div className='space-y-6'>
-      
+
       {/* Header + Add Button */}
       <div className='flex items-center justify-between'>
         <div>
@@ -64,7 +66,7 @@ const ExperienceForm = ({ data, onChange }) => {
           <p className='text-sm text-gray-500'>Add your job experience</p>
         </div>
 
-        <button 
+        <button
           onClick={addExperience}
           className='flex items-center gap-2 px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors'
         >
@@ -81,7 +83,7 @@ const ExperienceForm = ({ data, onChange }) => {
           <p className="text-sm">Click "Add Experience" to get started.</p>
         </div>
       ) : (
-        
+
         // ✅ List of Experience Cards
         <div className='space-y-4'>
           {data.map((experience, index) => (
@@ -90,7 +92,7 @@ const ExperienceForm = ({ data, onChange }) => {
               {/* Title + Delete Button */}
               <div className='flex justify-between items-start'>
                 <h4>Experience #{index + 1}</h4>
-                <button 
+                <button
                   onClick={() => removeExperience(index)}
                   className='text-red-500 hover:text-red-700 transition-colors'
                 >
@@ -100,7 +102,7 @@ const ExperienceForm = ({ data, onChange }) => {
 
               {/* Company, Job Title, Dates */}
               <div className="grid md:grid-cols-2 gap-3">
-                
+
                 <input
                   value={experience.company || ""}
                   onChange={(e) => updateExperience(index, "company", e.target.value)}
@@ -153,17 +155,17 @@ const ExperienceForm = ({ data, onChange }) => {
                     Job Description
                   </label>
 
-                  <button onClick={()=> generateDescription(index)} disabled={generatingIndex === index || !experience.position
+                  <button onClick={() => generateDescription(index)} disabled={generatingIndex === index || !experience.position
                     || !experience.company
                   }
                     className="flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors"
                   >
                     {generatingIndex === index ? (
-                      <Loader2 className='w-3 h-3 animate-spin'/>
+                      <Loader2 className='w-3 h-3 animate-spin' />
                     ) : (
                       <Sparkles className="w-3 h-3" />
                     )}
-                    
+
                     Enhance with AI
                   </button>
                 </div>

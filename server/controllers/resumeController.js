@@ -13,9 +13,9 @@ export const createResume = async (req, res) => {
     // Create new resume
     const newResume = await Resume.create({ userId, title });
     // return succes message
-    return res.status(201).json({ message: 'Resume created successfully' , resume: newResume });
-  
-} catch (error) {
+    return res.status(201).json({ message: 'Resume created successfully', resume: newResume });
+
+  } catch (error) {
     return res.status(400).json({ message: error.message });
   }
 }
@@ -46,10 +46,10 @@ export const getResumeById = async (req, res) => {
     const userId = req.userId;
     const { resumeId } = req.params;
 
-    const resume = await Resume.findOne({userId, _id: resumeId})
+    const resume = await Resume.findOne({ userId, _id: resumeId })
 
-    if(!resume){
-         return res.status(404).json({ message: 'Resume not Found' })
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not Found' })
     }
 
     resume.__v = undefined;
@@ -57,7 +57,7 @@ export const getResumeById = async (req, res) => {
     resume.updatedAt = undefined;
 
     // Return success message
-    return res.status(200).json({resume});
+    return res.status(200).json({ resume });
 
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -87,37 +87,39 @@ export const getPublicResumeById = async (req, res) => {
 
 // controller for updating a resume
 // PUT: /api/resumes/update
-export const updateResume = async (req, res) =>{
+export const updateResume = async (req, res) => {
   try {
     const userId = req.userId;
-    const {resumeId, resumeData, removeBackground} = req.body;
+    const { resumeId, resumeData, removeBackground } = req.body;
     const image = req.file;
 
     let resumeDataCopy;
     if (typeof resumeData === 'string') {
-        resumeDataCopy = await JSON.parse(resumeData)
+      resumeDataCopy = await JSON.parse(resumeData)
     } else {
-          resumeDataCopy = structuredClone(resumeData)
+      resumeDataCopy = structuredClone(resumeData)
     }
 
+    if (image) {
 
-    if(image){
+      const imageBufferData = fs.createReadStream(image.path)
 
-        const imageBufferData = fs.createReadStream(image.path)
-
-        const response = await imagekit.files.upload({
+      const response = await imagekit.files.upload({
         file: imageBufferData,
         fileName: 'resume.png',
         folder: 'user-resumes',
         transformation: {
-            pre: 'w-300,h-300,fo-face, z-0.75' + 
+          pre: 'w-300,h-300,fo-face, z-0.75' +
             (removeBackground ? ', e-bgremove' : '')
         }
-    });
+      });
 
-    resumeDataCopy.personal_info.image = response.url
+      resumeDataCopy.personal_info.image = response.url
 
     }
+
+    // Remove _id from resumeDataCopy to avoid immutable field error
+    delete resumeDataCopy._id;
 
     const resume = await Resume.findOneAndUpdate(
       { userId, _id: resumeId },
@@ -125,8 +127,8 @@ export const updateResume = async (req, res) =>{
       { new: true }
     );
 
-    return res.status(200).json({message: 'Saved successfully', resume});
+    return res.status(200).json({ message: 'Saved successfully', resume });
   } catch (error) {
-    return res.status(400).json({message: error.message});
+    return res.status(400).json({ message: error.message });
   }
 };
