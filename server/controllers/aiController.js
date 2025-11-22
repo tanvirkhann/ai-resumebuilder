@@ -5,15 +5,24 @@ import ai from "../configs/ai.js";
 // controller for enhanching a resume using ai
 // POST: /api/ai/enhance-pro-sum
 
-
-
 export const enhanceProfessionalSummary = async (req, res) => {
   try {
     const { userContent } = req.body;
 
+    // Log incoming request for debugging
+    console.log('AI Enhance Request - userContent length:', userContent?.length || 0);
+
     if (!userContent) {
-      return res.status(400).json({ message: "Missing required fields" });
+      console.log('Error: Missing userContent field');
+      return res.status(400).json({ message: "Missing required field: userContent" });
     }
+
+    if (userContent.trim().length === 0) {
+      console.log('Error: Empty userContent');
+      return res.status(400).json({ message: "userContent cannot be empty" });
+    }
+
+    console.log('Calling AI API with model:', process.env.OPENAI_MODEL);
 
     const response = await ai.chat.completions.create({
       model: process.env.OPENAI_MODEL,
@@ -24,16 +33,19 @@ export const enhanceProfessionalSummary = async (req, res) => {
     });
 
     const enhancedContent = response.choices[0].message.content;
-    return res.status(200).json({enhancedContent});
+    console.log('AI Response received successfully');
+
+    return res.status(200).json({ enhancedContent });
 
   } catch (error) {
-    return res.status(400).json({message : error.message});
+    console.error('AI Enhancement Error:', error.message);
+    console.error('Error stack:', error.stack);
+    return res.status(400).json({ message: error.message });
   }
 }
 
 //controller for enhancing a resume's job desicription
 // POST: /api/ai/enhance-job-desc
-
 
 export const enhanceJobDescription = async (req, res) => {
   try {
@@ -52,10 +64,10 @@ export const enhanceJobDescription = async (req, res) => {
     });
 
     const enhancedContent = response.choices[0].message.content;
-    return res.status(200).json({enhancedContent});
+    return res.status(200).json({ enhancedContent });
 
   } catch (error) {
-    return res.status(400).json({message : error.message});
+    return res.status(400).json({ message: error.message });
   }
 }
 
@@ -65,17 +77,17 @@ export const enhanceJobDescription = async (req, res) => {
 
 export const uploadResume = async (req, res) => {
   try {
-    
+
     const { resumeText, title } = req.body;
     const userId = req.userId;
 
     if (!resumeText) {
-    return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const systemPrompt = "You are an expert AI Agent to extract data from resumeText."
 
-    const userPrompt= `extract data from this resume: ${resumeText }
+    const userPrompt = `extract data from this resume: ${resumeText}
     
     Provide data inn the following Json format with no additional text before or 
     after:
@@ -129,16 +141,16 @@ export const uploadResume = async (req, res) => {
         { role: "user", content: userPrompt },
       ],
 
-      response_format:{type: 'json_object'}
+      response_format: { type: 'json_object' }
     });
 
     const extractedData = response.choices[0].message.content;
-    const parsedData =JSON.parse(extractedData)
-    const newResume = await Resume.create({userId,title, ...parsedData})
+    const parsedData = JSON.parse(extractedData)
+    const newResume = await Resume.create({ userId, title, ...parsedData })
 
-     res.json({resumeId: newResume._id});
+    res.json({ resumeId: newResume._id });
 
   } catch (error) {
-    return res.status(400).json({message : error.message});
+    return res.status(400).json({ message: error.message });
   }
 }
