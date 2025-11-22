@@ -7,22 +7,22 @@ import MinimalImageTemplate from './templates/MinimalImageTemplate'
 
 const ResumePreview = ({ data, template, accentColor, classes = "" }) => {
 
-    const rendertemplate=()=>{
-        switch(template){
-            case "modern" :
-                return <ModernTemplate data={data} accentColor={accentColor}/>;
-            
-            case "minimal" :
-                return <MinimalTemplate data={data} accentColor={accentColor}/>;
-            
-            case "minimal-image" :
-                return <MinimalImageTemplate data={data} accentColor={accentColor}/>;
-                
+  const rendertemplate = () => {
+    switch (template) {
+      case "modern":
+        return <ModernTemplate data={data} accentColor={accentColor} />;
 
-                default:
-                    return <ClassicTemplate data={data} accentColor={accentColor}/>;
-        }
+      case "minimal":
+        return <MinimalTemplate data={data} accentColor={accentColor} />;
+
+      case "minimal-image":
+        return <MinimalImageTemplate data={data} accentColor={accentColor} />;
+
+
+      default:
+        return <ClassicTemplate data={data} accentColor={accentColor} />;
     }
+  }
 
   return (
     <div className="w-full bg-gray-100">
@@ -30,9 +30,9 @@ const ResumePreview = ({ data, template, accentColor, classes = "" }) => {
         id="resume-preview"
         className={
           "border border-gray-200 print:shadow-none print:border-none " + classes}>
-            {rendertemplate()}
+        {rendertemplate()}
       </div>
-      <style jsx>
+      <style>
         {`
         @page {
   size: letter;
