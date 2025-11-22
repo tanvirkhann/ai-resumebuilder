@@ -78,6 +78,17 @@ const MinimalTemplate = ({ data, accentColor }) => {
                         {data.project.map((proj, index) => (
                             <div key={index} className="flex flex-col gap-2 justify-between items-baseline">
                                 <h3 className="text-lg font-medium ">{proj.name}</h3>
+                                {proj.url && (
+                                    <a
+                                        href={proj.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm hover:underline"
+                                        style={{ color: accentColor }}
+                                    >
+                                        {proj.url}
+                                    </a>
+                                )}
                                 <p className="text-gray-600">{proj.description}</p>
                             </div>
                         ))}

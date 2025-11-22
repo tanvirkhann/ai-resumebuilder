@@ -103,12 +103,23 @@ const ModernTemplate = ({ data, accentColor }) => {
 
 						<div className="space-y-6">
 							{data.project.map((p, index) => (
-								<div key={index} className="relative pl-6 border-l border-gray-200" style={{borderLeftColor: accentColor}}>
+								<div key={index} className="relative pl-6 border-l border-gray-200" style={{ borderLeftColor: accentColor }}>
 
 
 									<div className="flex justify-between items-start">
 										<div>
 											<h3 className="text-lg font-medium text-gray-900">{p.name}</h3>
+											{p.url && (
+												<a
+													href={p.url}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="text-sm hover:underline block mt-1"
+													style={{ color: accentColor }}
+												>
+													{p.url}
+												</a>
+											)}
 										</div>
 									</div>
 									{p.description && (
